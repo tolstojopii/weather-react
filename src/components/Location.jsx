@@ -1,8 +1,5 @@
 const Location = (props) => {
-    const {
-        city,
-        dateNow,
-    } = props
+  const { city, dateNow } = props;
 
   return (
     <div className="location">

@@ -1,19 +1,19 @@
-import { use, useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import Search from "./components/Search";
-import WeatherDetails from "./components/weatherDetails";
-import WeatherInfo from "./components/weatherInfo";
-import Location from "./components/location";
+import WeatherDetails from "./components/WeatherDetails";
+import WeatherInfo from "./components/WeatherInfo";
+import Location from "./components/Location";
+import ShowBtn from "./components/ShowBtn";
 
-function App(props) {
-  const {} = props;
-
+function App() {
   const [city, setCity] = useState("Курск");
-  const [temp, setTemp] = useState("6");
-  const [dateNow, setDateNow] = useState("вторник, 23 марта");
   const [weatherData, setWeatherData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [toggleShowButton, setToggleShowButton] = useState(false);
+  const [shouldRender, setShouldRender] = useState(false)
+  const [isRemoving, setIsRemoving] = useState(false)
 
   // функция запроса на поиск координат города(геокодинг)
   const fetchCoordinates = async (cityName) => {
@@ -29,7 +29,7 @@ function App(props) {
     return { lat: latitude, lon: longitude, city: name, country };
   };
 
-  //функция получения погоды по координатам
+  // функция получения погоды по координатам
   const fetchWeatherByCoords = async (lat, lon) => {
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=auto&forecast_days=1`;
     const response = await fetch(url);
@@ -41,7 +41,7 @@ function App(props) {
     return data;
   };
 
-  const fecthWeather = async (cityName) => {
+  const fetchWeather = async (cityName) => {
     setLoading(true);
     setError("");
 
@@ -75,13 +75,13 @@ function App(props) {
       const temp = Math.round(current.temperature);
 
       // ну это та же самая тема, только в этот раз воздух и код погоды какой то хз че он даёт
-      const wind = currnet.windspeed;
+      const windSpeed = current.windspeed;
       const weatherCode = current.weathercode;
 
       /* влажность, но здесь используется idx, idx это короче тот час который нашли ранее, и 
       если слева значение равно null or undefined то мы используем просто 80% потому что это типо стабильное число */
       const humidity = hourly.relative_humidity_2m[idx] ?? 80;
-      
+
       // здесь давление, но его можно получить только в платной версии я че даун платить за неё? делаем заглушку(статичное значение)
       const pressure = 1013;
 
@@ -89,7 +89,16 @@ function App(props) {
       const description = getWeatherDescription(weatherCode);
       const iconEmoji = getWeatherIcon(weatherCode);
 
-
+      console.log(
+        "city:",
+        city,
+        "temp:",
+        current.temperature,
+        "wind:",
+        current.windspeed,
+        "humidity:",
+        hourly.relative_humidity_2m[idx],
+      );
       // Объект по которому будет изменяться состояение, то есть при первом рендере будет изменяться вот эти данные
       setWeatherData({
         city: city,
@@ -143,7 +152,6 @@ function App(props) {
     return codes[code] || "Погода";
   };
 
-
   // получение иконки для определенных чисел погоды сверху, сделано через оператор if, потому что повторяются смайлики
   const getWeatherIcon = (code) => {
     if ([0, 1].includes(code)) return "☀️";
@@ -161,16 +169,79 @@ function App(props) {
     setCity(newCity);
   };
 
+  useEffect(() => {
+  if (toggleShowButton) {
+    
+    setShouldRender(true);
+    setIsRemoving(false);
+  } else {
+    
+    if (shouldRender) {
+      setIsRemoving(true);
+      const timer = setTimeout(() => {
+        setShouldRender(false);
+      }, 3000); 
+      return () => clearTimeout(timer);
+    }
+  }
+}, [toggleShowButton, shouldRender]);
+
+
+
+
+
+  useEffect(() => {
+    if (city) {
+      fetchWeather(city);
+    }
+  }, [city]);
+
+
+  const toToggleShowButton = () => {
+    setToggleShowButton(!toggleShowButton);
+  };
+
+
+
+
+
+
   return (
     <>
-      <div className="weather-card">
-        <Search onSearch={handleSearch} city={city} />
-        <div className="weather-info">
-          <Location city={city} dateNow={dateNow} />
-          <WeatherInfo temp={temp} />
-          <WeatherDetails />
+      <ShowBtn
+        toToggleShowButton={toToggleShowButton}
+        toggleShowButton={toggleShowButton}
+      />
+      {shouldRender &&
+      ( 
+        <div className={`weather-card ${isRemoving ? 'fade-out' : ''}`}>
+          <Search onSearch={handleSearch} />
+          {loading && <div className="loading">Загрузка...</div>}
+          {error && <div className="error">{error}</div>}
+          {weatherData && (
+            <div className="weather-info">
+              <Location
+                city={weatherData.city}
+                dateNow={new Date().toLocaleDateString("ru-RU", {
+                  weekday: "long",
+                  day: "numeric",
+                  month: "long",
+                })}
+              />
+              <WeatherInfo
+                temp={weatherData.temp}
+                condition={weatherData.condition}
+                icon={weatherData.icon}
+              />
+              <WeatherDetails
+                humidity={weatherData.humidity}
+                windSpeed={weatherData.windSpeed}
+                pressure={weatherData.pressure}
+              />
+            </div>
+          )}
         </div>
-      </div>
+      )}
     </>
   );
 }

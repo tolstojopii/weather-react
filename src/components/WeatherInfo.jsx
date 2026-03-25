@@ -1,7 +1,5 @@
 const WeatherInfo = (props) => {
-    const {
-        temp
-    } = props
+  const { temp, condition, icon } = props;
   return (
     <>
       <div className="weather-main">
@@ -10,10 +8,10 @@ const WeatherInfo = (props) => {
           <span className="celsius">°C</span>
         </div>
         <div className="weather-icon">
-          <span>☁️</span>
+          <span>{icon}</span>
         </div>
       </div>
-      <div className="weather-condition">Пасмурно, небольшой дождь</div>
+      <div className="weather-condition">{condition}</div>
     </>
   );
 };
