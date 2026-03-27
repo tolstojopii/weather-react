@@ -12,8 +12,10 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [toggleShowButton, setToggleShowButton] = useState(false);
-  const [shouldRender, setShouldRender] = useState(false)
-  const [isRemoving, setIsRemoving] = useState(false)
+  const [shouldRender, setShouldRender] = useState(false);
+  const [isRemoving, setIsRemoving] = useState(false);
+  const [isAppears, setIsAppears] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   // функция запроса на поиск координат города(геокодинг)
   const fetchCoordinates = async (cityName) => {
@@ -170,25 +172,23 @@ function App() {
   };
 
   useEffect(() => {
-  if (toggleShowButton) {
-    
-    setShouldRender(true);
-    setIsRemoving(false);
-  } else {
-    
-    if (shouldRender) {
-      setIsRemoving(true);
+    if (toggleShowButton) {
+      setIsAppears(true);
       const timer = setTimeout(() => {
-        setShouldRender(false);
-      }, 3000); 
+        setShouldRender(true);
+      }, 1000);
       return () => clearTimeout(timer);
+    } else {
+      if (shouldRender) {
+        setIsRemoving(true);
+        const timer = setTimeout(() => {
+          setShouldRender(false);
+          setIsRemoving(false);
+        }, 1000);
+        return () => clearTimeout(timer);
+      }
     }
-  }
-}, [toggleShowButton, shouldRender]);
-
-
-
-
+  }, [toggleShowButton, shouldRender]);
 
   useEffect(() => {
     if (city) {
@@ -196,25 +196,22 @@ function App() {
     }
   }, [city]);
 
-
   const toToggleShowButton = () => {
     setToggleShowButton(!toggleShowButton);
+    setIsAnimating(!isAnimating);
   };
-
-
-
-
-
 
   return (
     <>
       <ShowBtn
         toToggleShowButton={toToggleShowButton}
         toggleShowButton={toggleShowButton}
+        isAnimating={isAnimating}
       />
-      {shouldRender &&
-      ( 
-        <div className={`weather-card ${isRemoving ? 'fade-out' : ''}`}>
+      {shouldRender && (
+        <div
+          className={`weather-card`}
+        >
           <Search onSearch={handleSearch} />
           {loading && <div className="loading">Загрузка...</div>}
           {error && <div className="error">{error}</div>}

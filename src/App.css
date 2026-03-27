@@ -6,7 +6,7 @@
 
 body {
   font-family: "Inter", sans-serif;
-  background: linear-gradient(145deg, #e0eafc 0%, #cfdef3 100%);
+  background: linear-gradient(145deg, #e0eafc 0%, #458aeb 100%);
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -14,32 +14,42 @@ body {
   padding: 1.5rem;
 }
 
-
+/* #root {
+  position: relative;
+} */
 
 .show-button {
-  padding: 10px;
   justify-self: center;
+  position: absolute;
+  /* top: -8.512rem; */
+  top: 10%;
+  z-index: 1;
 }
 
 .show-button button {
-  width: 100px;
-  height: 100px;
+  width: 6.25rem;
+  height: 6.25rem;
   border: none;
   border-radius: 50%;
   cursor: pointer;
+  background-color: #6998ff;
+  color: white;
+  transition: all 0.3s;
+  box-shadow: black rgba(1, 1, 1, 2);
+}
+
+.show-button button:hover {
+  transform: translateY(-4px);
   background-color: white;
   color: #2563eb;
-  
 }
 
-.show-button button.fade-out {
-  transform: translateY(500px);
-  transition: transform 3s ease;
+.show-button.fade-out{
+  animation: movingButton 2s ease;
 }
 
-
-.weather-card.fade-out {
-  transform: translateY(500px);
+.show-button.fade-in{
+  animation: unMovingButton 2s ease;
 }
 
 .weather-card {
@@ -53,7 +63,7 @@ body {
     0 4px 12px rgba(0, 0, 0, 0.05);
   overflow: hidden;
   flex-direction: row;
-  transition: transform 3s ease;
+  transition: transform 0.3s ease;
 }
 
 .weather-card:hover {
@@ -61,7 +71,6 @@ body {
   transition: transform 0.2s ease;
 }
 
-/* Шапка с поиском */
 .search-section {
   padding: 1.8rem 1.8rem 0.8rem 1.8rem;
   background: white;
@@ -105,7 +114,7 @@ body {
   color: white;
   font-weight: 600;
   font-size: 0.9rem;
-  cursor: pointer; /* визуально — кнопка, но логики пока нет */
+  cursor: pointer;
   transition: background 0.2s;
   font-family: "Inter", sans-serif;
   display: flex;
@@ -118,12 +127,10 @@ body {
   background: #2563eb;
 }
 
-/* Основной блок с информацией о погоде */
 .weather-info {
   padding: 1.5rem 1.8rem 2.2rem 1.8rem;
 }
 
-/* Город и время */
 .location {
   display: flex;
   align-items: baseline;
@@ -148,7 +155,6 @@ body {
   font-weight: 500;
 }
 
-/* Температура и главная иконка */
 .weather-main {
   display: flex;
   align-items: center;
@@ -199,7 +205,6 @@ body {
   box-shadow: 0 6px 12px -8px rgba(0, 0, 0, 0.1);
 }
 
-/* Детали: влажность, ветер, давление */
 .weather-details {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -238,7 +243,6 @@ body {
   color: #5b6e8c;
 }
 
-/* Адаптив для небольших экранов */
 @media (max-width: 480px) {
   body {
     padding: 1rem;
@@ -268,17 +272,57 @@ body {
   }
 }
 
-/* Простая анимация загрузки (только для атмосферы) */
-@keyframes subtlePulse {
+
+@keyframes movingButton {
   0% {
-    opacity: 0.6;
+    transform: translateY(0rem);
+  }
+  25% {
+    transform: translateY(300px);
+  }  
+  50% {
+    transform: translateY(300px) scale(6.6)  rotate(360deg);
+  }
+  75%{
+    transform: translateY(300px) scale(1);
   }
   100% {
-    opacity: 1;
+    transform: translateY(0px);
   }
 }
 
-/* элементы-заглушки статичны, но можно потом динамически менять содержимое */
+@keyframes unMovingButton {
+  0% {
+    transform: translateY(0rem);
+  }
+  25% {
+    transform: translateY(300px);
+  }  
+  50% {
+    transform: translateY(300px) scale(6.6)  rotate(360deg);
+  }
+  75%{
+    transform: translateY(300px) scale(1);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+
+
+/* @keyframes movingButton{
+  0%{
+    transform: rotate(0deg);
+  }
+  50%{
+    transform: translateY(-40px) ;
+  }
+  100%{
+    transform: translateY(200px);
+  }
+} */
+
 .weather-icon span {
   display: inline-block;
 }

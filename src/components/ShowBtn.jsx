@@ -1,9 +1,16 @@
 const ShowBtn = (props) => {
-  const { toToggleShowButton, toggleShowButton } = props;
-
+  const { toToggleShowButton, isAnimating } = props;
+  let show = 'Открыть'
+  let hide = 'Скрыть'
+  const changeName = () => {
+    show = hide
+  }
   return (
-    <div className="show-button">
-      <button onClick={() => toToggleShowButton()}>Кнопочка</button>
+    <div className={`show-button ${isAnimating ? 'fade-in'  :  'fade-out'}`}>
+      <button
+      onClick={() => toToggleShowButton()}
+      
+      ><b>{show}</b></button>
     </div>
   );
 };
